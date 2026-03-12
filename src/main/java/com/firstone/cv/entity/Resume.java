@@ -10,8 +10,11 @@ import org.springframework.data.annotation.Id;
 // import jakarta.persistence.JoinColumn;
 // import jakarta.persistence.ManyToOne;
 import jakarta.persistence.*;
+import lombok.Data;
 
-
+@Entity
+@Table(name = "resumes")
+@Data
 public class Resume {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
