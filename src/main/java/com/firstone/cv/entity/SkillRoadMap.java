@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 
 
 
+@Entity
+@Table(name = "skill_roadmaps")
 public class SkillRoadMap {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
