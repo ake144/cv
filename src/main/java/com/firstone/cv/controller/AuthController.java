@@ -27,6 +27,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody RegisterRequest request) {
        
+        System.out.println("Received registration request: " + request.getEmail() + ", " + request.getFullName() + ", " + request.getRole());
        
         String token  = authService.register(request.getEmail(), request.getPassword(), request.getFullName(), request.getRole());
         return ResponseEntity.ok(token);
