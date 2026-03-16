@@ -36,7 +36,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         System.out.println("Authorization header: " + authHeader); // Debug log
 
-        String jwt = authHeader.substring(7).replaceAll("[\"\']", "").trim();
+        String jwt = authHeader.replace("Bearer ", "").replaceAll("[\"\']", "").trim();
         System.out.println("Extracted JWT: " + jwt); // Debug log
         String userEmail = jwtUtils.extractUsername(jwt);
 
