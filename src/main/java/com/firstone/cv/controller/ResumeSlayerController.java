@@ -7,8 +7,10 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.firstone.cv.entity.SkillRoadMap;
 import com.firstone.cv.entity.Resume;
 import com.firstone.cv.entity.User;
 import com.firstone.cv.repository.ResumeRepo;
@@ -57,6 +59,22 @@ public class ResumeSlayerController {
             slay.setJobUrl(request.getJobUrl() != null ? request.getJobUrl() : "Unknown URL");
             slay.setAtsScore(request.getAtsScore() != null ? request.getAtsScore() : "92%");
 
+            // Add the new fields
+            if (request.getTrapsFixed() != null) {
+                // If it's an array from JSON, it might come as a String representation if not properly mapped, let's just save the string.
+                slay.setTrapsFixed(request.getTrapsFixed().toString());
+            }
+
+            if (request.getRoadmap() != null) {
+                SkillRoadMap roadmap = new SkillRoadMap();
+                roadmap.setResume(slay);
+                roadmap.setRoadMapText(request.getRoadmap());
+                if (request.getMissingSkills() != null) {
+                    roadmap.setMissingSkills(request.getMissingSkills().toString());
+                }
+                slay.setRoadMap(roadmap);
+            }
+
             resumeRepo.save(slay);
 
             return ResponseEntity.ok(Map.of(
@@ -73,7 +91,12 @@ public class ResumeSlayerController {
 
     @GetMapping
     public ResponseEntity<?> getSlays(
-        @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        @RequestHeader(value = "Authorization", 
+        required = false) String authHeader,
+       @RequestParam(value = "page", defaultValue = "0") int page,
+        @RequestParam(value = "size", defaultValue = "10") int size,
+        @RequestParam(value= "sort", defaultValue = "createdAt,desc") String sort
+    ) {
         try {
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
                 return ResponseEntity.status(401).body("Missing or invalid Authorization header");
@@ -127,4 +150,7 @@ class ResumeRequest {
     private String jobUrl;
     private String optimizedResume;
     private String atsScore;
+    private String trapsFixed;
+    private Object missingSkills; // Array of strings or String
+    private String roadmap;
 }

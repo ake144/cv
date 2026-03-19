@@ -2,9 +2,9 @@ package com.firstone.cv.entity;
 
 
 import jakarta.persistence.*;
+import lombok.Data;
 
-
-
+@Data
 @Entity
 @Table(name = "skill_roadmaps")
 public class SkillRoadMap {

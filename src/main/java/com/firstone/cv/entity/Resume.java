@@ -32,7 +32,10 @@ public class Resume {
 
     private String jobTitle;
     private String jobUrl;
+;    @Column(columnDefinition = "TEXT")
     private String atsScore;
+
+    @Column(columnDefinition = "TEXT")
     private String trapsFixed;
 
     @OneToOne(mappedBy = "resume", cascade = CascadeType.ALL)
