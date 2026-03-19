@@ -2,6 +2,8 @@ package com.firstone.cv.controller;
 
 import java.util.Map;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -93,9 +95,9 @@ public class ResumeSlayerController {
     public ResponseEntity<?> getSlays(
         @RequestHeader(value = "Authorization", 
         required = false) String authHeader,
-       @RequestParam(value = "page", defaultValue = "0") int page,
-        @RequestParam(value = "size", defaultValue = "10") int size,
-        @RequestParam(value= "sort", defaultValue = "createdAt,desc") String sort
+       @RequestParam(required = false,value = "page", defaultValue = "0") int page,
+        @RequestParam(required = false,value = "size", defaultValue = "10") int size,
+        @RequestParam(required = false,value= "sort", defaultValue = "createdAt,desc") String sort
     ) {
         try {
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -106,7 +108,7 @@ public class ResumeSlayerController {
 
             User user = userRepo.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
 
-            return ResponseEntity.ok(resumeRepo.findByUser(user));
+            return ResponseEntity.ok(resumeRepo.findByUser(user, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sort.split(",")[1]), sort.split(",")[0]))));
         } catch (RuntimeException e) {
             return ResponseEntity.status(404).body(e.getMessage());
         } catch (Exception e) {
