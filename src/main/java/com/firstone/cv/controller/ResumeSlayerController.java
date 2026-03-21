@@ -108,7 +108,35 @@ public class ResumeSlayerController {
 
             User user = userRepo.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
 
-            return ResponseEntity.ok(resumeRepo.findByUser(user, PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sort.split(",")[1]), sort.split(",")[0]))));
+            org.springframework.data.domain.Page<Resume> pageResult = resumeRepo.findByUser(user, 
+                PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sort.split(",")[1]), sort.split(",")[0])));
+
+            Map<String, Object> response = new java.util.LinkedHashMap<>();
+            response.put("currentPage", pageResult.getNumber());
+            response.put("totalItems", pageResult.getTotalElements());
+            response.put("totalPages", pageResult.getTotalPages());
+            response.put("hasNext", pageResult.hasNext());
+
+            java.util.List<Map<String, Object>> content = pageResult.getContent().stream().map(slay -> {
+                Map<String, Object> map = new java.util.LinkedHashMap<>();
+                map.put("id", slay.getId());
+                map.put("jobTitle", slay.getJobTitle());
+                map.put("jobUrl", slay.getJobUrl());
+                map.put("atsScore", slay.getAtsScore());
+                map.put("trapsFixed", slay.getTrapsFixed().replace("\\n", "\n").replace("\\\"", "\""));
+                
+                // Format resume correctly to avoid weird escape characters in JSON
+                String optResume = slay.getOptimizedResume();
+                if (optResume != null) {
+                    map.put("optimizedResume", optResume.replace("\\n", "\n").replace("\\\"", "\""));
+                }
+                map.put("createdAt", slay.getCreatedAt().toString());
+                return map;
+            }).collect(java.util.stream.Collectors.toList());
+
+            response.put("content", content);
+
+            return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
             return ResponseEntity.status(404).body(e.getMessage());
         } catch (Exception e) {
@@ -133,7 +161,27 @@ public class ResumeSlayerController {
             if (!slay.getUser().getId().equals(user.getId())) {
                 return ResponseEntity.status(403).body("Forbidden: You do not have access to this slay");
             }
-            return ResponseEntity.ok(slay);
+
+            
+            
+            Map<String, Object> map = new java.util.LinkedHashMap<>();
+            map.put("id", slay.getId());
+            map.put("jobTitle", slay.getJobTitle());
+            map.put("jobUrl", slay.getJobUrl());
+            map.put("atsScore", slay.getAtsScore());
+            map.put("originalResume", slay.getOriginalResume());
+            
+            // Format resume correctly to avoid weird escape characters in JSON
+            String optResume = slay.getOptimizedResume();
+            if (optResume != null) {
+                map.put("optimizedResume", optResume.replace("\\n", "\n").replace("\\\"", "\""));
+            }
+            
+            if (slay.getTrapsFixed() != null) map.put("trapsFixed", slay.getTrapsFixed().replace("\\n", "\n").replace("\\\"", "\""));
+            if (slay.getRoadMap() != null) map.put("roadmap", slay.getRoadMap());
+            map.put("createdAt", slay.getCreatedAt().toString());
+            
+            return ResponseEntity.ok(map);
         } catch (RuntimeException e) {
             return ResponseEntity.status(404).body(e.getMessage());
         } catch (Exception e) {
