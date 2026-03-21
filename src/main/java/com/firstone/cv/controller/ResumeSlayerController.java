@@ -123,7 +123,9 @@ public class ResumeSlayerController {
                 map.put("jobTitle", slay.getJobTitle());
                 map.put("jobUrl", slay.getJobUrl());
                 map.put("atsScore", slay.getAtsScore());
-                map.put("trapsFixed", slay.getTrapsFixed().replace("\\n", "\n").replace("\\\"", "\""));
+                if(slay.getTrapsFixed() != null) {
+                    map.put("trapsFixed", slay.getTrapsFixed().replace("\\n", "\n").replace("\\\"", "\""));
+                }
                 
                 // Format resume correctly to avoid weird escape characters in JSON
                 String optResume = slay.getOptimizedResume();
