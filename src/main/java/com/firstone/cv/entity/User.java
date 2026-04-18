@@ -1,7 +1,5 @@
 package com.firstone.cv.entity;
 
-import org.checkerframework.checker.units.qual.C;
-
 import jakarta.persistence.*;
 import lombok.Data;
 

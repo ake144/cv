@@ -35,13 +35,13 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthFilter jwtAuthFilter) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())  // Disable CSRF for REST APIs
-                .cors(Customizer.withDefaults())  // Enable CORS
+                .csrf(csrf -> csrf.disable()) // Disable CSRF for REST APIs
+                .cors(Customizer.withDefaults()) // Enable CORS
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()  // Allow auth endpoints
+                        .requestMatchers("/api/auth/**").permitAll() // Allow auth endpoints
                         .requestMatchers("/", "/index.html").permitAll() // Allow home page
-                        .requestMatchers("/api/slayer").permitAll() // Allow slayer endpoint
-                        .anyRequest().authenticated()  // Secure others
+                        .requestMatchers("/api/slayer/**").authenticated() // Protect slayer endpoints
+                        .anyRequest().authenticated() // Secure everything else
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
@@ -62,20 +62,21 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(java.util.List.of("http://localhost:3001","http://localhost:3000", "http://127.0.0.1:3002"));
+        configuration.setAllowedOrigins(
+                java.util.List.of("http://localhost:3001", "http://localhost:3002", "http://127.0.0.1:3002"));
         configuration.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(java.util.List.of("*"));
         configuration.setAllowCredentials(true);
-        
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
 
-//    @Bean
-//    public Filter jwtAuthFilter() {
-//        return new JwtAuthFilter(jwtUtils, userDetailsService);
-//    }
+    // @Bean
+    // public Filter jwtAuthFilter() {
+    // return new JwtAuthFilter(jwtUtils, userDetailsService);
+    // }
 
     // UserDetailsService bean (loads user from DB)
     @Bean
@@ -84,7 +85,7 @@ public class SecurityConfig {
                 .map(user -> org.springframework.security.core.userdetails.User
                         .withUsername(user.getEmail())
                         .password(user.getPassword())
-                        .authorities("USER")  // Add roles if needed
+                        .authorities("USER") // Add roles if needed
                         .build())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }

@@ -1,6 +1,5 @@
 package com.firstone.cv.entity;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Id;
@@ -32,7 +31,8 @@ public class Resume {
 
     private String jobTitle;
     private String jobUrl;
-;    @Column(columnDefinition = "TEXT")
+
+    @Column(columnDefinition = "TEXT")
     private String atsScore;
 
     @Column(columnDefinition = "TEXT")
@@ -41,6 +41,6 @@ public class Resume {
     @OneToOne(mappedBy = "resume", cascade = CascadeType.ALL)
     private SkillRoadMap roadMap;
 
-    private LocalDate createdAt = LocalDate.now();
-    
+    private LocalDateTime createdAt = LocalDateTime.now();
+
 }
