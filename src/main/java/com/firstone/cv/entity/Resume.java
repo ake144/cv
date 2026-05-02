@@ -24,12 +24,12 @@ public class Resume {
     private User user;
 
     @Column(columnDefinition = "TEXT")
-    private String originalResume;
+    private String optimizedResume; // kept for backward compatibility; canonical optimized resume is stored in UserOptimizedResume
 
     @Column(columnDefinition = "TEXT")
-    private String optimizedResume;
-
     private String jobTitle;
+
+    @Column(columnDefinition = "TEXT")
     private String jobUrl;
 
     @Column(columnDefinition = "TEXT")
